@@ -13,7 +13,7 @@ const computerSettings = document.getElementById('computerSettings');
 let isPlayer1Turn = true;
 let gameActive = true;
 let isComputerMode = false;
-let computerDifficulty = 'easy';
+let computerDifficulty = 'veryEasy';
 let scores = {
     player1: { wins: 0, losses: 0 },
     player2: { wins: 0, losses: 0 }
@@ -73,7 +73,13 @@ function handleCellClick(e) {
     } else {
         swapTurns();
         if (isComputerMode && !isPlayer1Turn) {
-            setTimeout(makeComputerMove, 500);
+            // Disable board interaction while computer is thinking
+            board.style.pointerEvents = 'none';
+            setTimeout(() => {
+                makeComputerMove();
+                // Re-enable board interaction after computer's move
+                board.style.pointerEvents = 'auto';
+            }, 500);
         }
     }
 }
@@ -89,7 +95,11 @@ function placeMark(cell, currentClass) {
 
 function swapTurns() {
     isPlayer1Turn = !isPlayer1Turn;
-    status.textContent = isPlayer1Turn ? "Player 1's turn (Blue)" : "Player 2's turn (Red)";
+    if (isComputerMode && !isPlayer1Turn) {
+        status.textContent = "Computer's turn (Red)";
+    } else {
+        status.textContent = isPlayer1Turn ? "Player 1's turn (Blue)" : "Player 2's turn (Red)";
+    }
     status.style.color = isPlayer1Turn ? '#007bff' : '#dc3545';
 }
 
@@ -126,7 +136,7 @@ function endGame(draw) {
         status.style.color = '#6c757d';
         sounds.draw.play();
     } else {
-        const winner = isPlayer1Turn ? "Player 1" : "Player 2";
+        const winner = isPlayer1Turn ? "Player 1" : (isComputerMode ? "Computer" : "Player 2");
         status.textContent = `${winner} wins!`;
         status.style.color = winner === "Player 1" ? '#007bff' : '#dc3545';
         sounds.win.play();
@@ -152,6 +162,7 @@ function restartGame() {
         cell.classList.remove('circle', 'cross', 'winning-cell');
         cell.textContent = '';
     });
+    board.style.pointerEvents = 'auto';
 }
 
 function makeComputerMove() {
