@@ -1,56 +1,26 @@
-* {
-    box-sizing: border-box;
+body {
     margin: 0;
     padding: 0;
-}
-
-body {
-    font-family: Arial, sans-serif;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    background-color: #f0f2f5;
-    background-image: 
-        radial-gradient(circle at 25px 25px, rgba(0, 123, 255, 0.1) 2%, transparent 0%),
-        radial-gradient(circle at 75px 75px, rgba(220, 53, 69, 0.1) 2%, transparent 0%);
-    background-size: 100px 100px;
-    position: relative;
-    overflow: hidden;
-}
-
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 242, 245, 0.9) 100%);
-    z-index: -1;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle at center, #f0f0f0 0%, #e0e0e0 100%);
 }
 
 .container {
     text-align: center;
-    background-color: rgba(255, 255, 255, 0.95);
-    padding: 2.5rem;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1),
-                0 5px 15px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.container:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12),
-                0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 h1 {
     color: #333;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     font-size: 2.5rem;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -69,12 +39,6 @@ h1 {
     gap: 0.5rem;
 }
 
-.status.computer-turn {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2);
-}
-
 .status.player-turn {
     background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
     color: white;
@@ -85,23 +49,28 @@ h1 {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    margin-bottom: 1.5rem;
-    perspective: 1000px;
+    margin: 20px auto;
+    max-width: 400px;
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .cell {
     width: 120px;
     height: 120px;
-    background-color: #f8f9fa;
+    background: #f8f9fa;
     border: 2px solid #dee2e6;
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     font-size: 4rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    transform-style: preserve-3d;
+    position: relative;
+    overflow: hidden;
 }
 
 .cell:hover {
@@ -110,68 +79,48 @@ h1 {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.cell.circle {
-    color: #007bff;
-    animation: popIn 0.3s ease-out;
-}
-
-.cell.cross {
+.cell.x {
     color: #dc3545;
-    animation: popIn 0.3s ease-out;
 }
 
-@keyframes popIn {
-    0% {
-        transform: scale(0.5);
-        opacity: 0;
-    }
-    70% {
-        transform: scale(1.1);
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+.cell.o {
+    color: #007bff;
 }
 
 .score-board {
     display: flex;
     justify-content: space-around;
-    margin: 2rem 0;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .score {
     text-align: center;
-    padding: 1rem;
-    transition: transform 0.3s ease;
-}
-
-.score:hover {
-    transform: translateY(-3px);
-}
-
-.score h3 {
-    margin-bottom: 0.5rem;
-    color: #333;
-    font-size: 1.3rem;
-}
-
-.score-count {
-    font-size: 1.2rem;
-    color: #666;
-    margin: 0.5rem 0;
-    padding: 0.5rem;
-    background-color: white;
+    padding: 10px 20px;
+    background: white;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    min-width: 150px;
 }
 
-#restartButton {
-    padding: 1rem 2rem;
+.score span:first-child {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #495057;
+}
+
+.score span:last-child {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007bff;
+}
+
+button {
+    padding: 12px 24px;
     font-size: 1.1rem;
     background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
     color: white;
@@ -179,174 +128,16 @@ h1 {
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-#restartButton:hover {
+button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
 }
 
-#restartButton:active {
-    transform: translateY(1px);
-}
-
-/* Winning animation */
-@keyframes winner {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-.winning-cell {
-    animation: winner 0.5s ease-in-out;
-    background-color: #e8f5e9 !important;
-}
-
-.game-mode-selector {
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-}
-
-.game-mode-selector h3 {
-    margin-bottom: 1rem;
-    color: #333;
-}
-
-.mode-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-bottom: 1rem;
-}
-
-.mode-button {
-    padding: 0.8rem 1.5rem;
-    font-size: 1rem;
-    background: white;
-    color: #666;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.mode-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.mode-button.active {
-    background: #007bff;
-    color: white;
-    border-color: #007bff;
-}
-
-.computer-settings {
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    margin-top: 1rem;
-}
-
-.computer-settings.hidden {
-    display: none;
-}
-
-.computer-settings h4 {
-    margin-bottom: 0.8rem;
-    color: #333;
-}
-
-.difficulty-selector {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-}
-
-.difficulty-selector label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    color: #666;
-    transition: color 0.3s ease;
-}
-
-.difficulty-selector label:hover {
-    color: #007bff;
-}
-
-.difficulty-selector input[type="radio"] {
-    width: 1.2rem;
-    height: 1.2rem;
-    cursor: pointer;
-}
-
-/* Computer thinking animation */
-@keyframes thinking {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-}
-
-.computer-thinking {
-    position: relative;
-    padding: 0.5rem 1rem;
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    border-radius: 8px;
-    animation: thinking 1s infinite;
-    display: inline-block;
-    margin-left: 0.5rem;
-}
-
-.computer-thinking::before {
-    content: '';
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    background: white;
-    border-radius: 50%;
-    margin-right: 8px;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
-
-/* Disabled state for board during computer's turn */
-.game-board.disabled {
-    opacity: 0.7;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
-
-/* Enhanced cell hover effect */
-.cell:not(.disabled):hover {
-    background-color: #e9ecef;
-    transform: scale(1.05) rotateX(5deg);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Computer move highlight */
-@keyframes computerMove {
-    0% { background-color: rgba(220, 53, 69, 0.1); }
-    50% { background-color: rgba(220, 53, 69, 0.2); }
-    100% { background-color: rgba(220, 53, 69, 0.1); }
-}
-
-.cell.computer-move {
-    animation: computerMove 0.5s ease-out;
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 } 
