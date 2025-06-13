@@ -2,8 +2,17 @@ const board = document.getElementById('board');
 const cells = document.querySelectorAll('[data-cell]');
 const status = document.getElementById('status');
 const restartButton = document.getElementById('restartButton');
+const player1Wins = document.getElementById('player1Wins');
+const player1Losses = document.getElementById('player1Losses');
+const player2Wins = document.getElementById('player2Wins');
+const player2Losses = document.getElementById('player2Losses');
+
 let isPlayer1Turn = true;
 let gameActive = true;
+let scores = {
+    player1: { wins: 0, losses: 0 },
+    player2: { wins: 0, losses: 0 }
+};
 
 const winningCombinations = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
@@ -62,8 +71,26 @@ function endGame(draw) {
     if (draw) {
         status.textContent = "Game ended in a draw!";
     } else {
-        status.textContent = `${isPlayer1Turn ? "Player 1" : "Player 2"} wins!`;
+        const winner = isPlayer1Turn ? "Player 1" : "Player 2";
+        status.textContent = `${winner} wins!`;
+        
+        // Update scores
+        if (winner === "Player 1") {
+            scores.player1.wins++;
+            scores.player2.losses++;
+        } else {
+            scores.player2.wins++;
+            scores.player1.losses++;
+        }
+        updateScoreDisplay();
     }
+}
+
+function updateScoreDisplay() {
+    player1Wins.textContent = scores.player1.wins;
+    player1Losses.textContent = scores.player1.losses;
+    player2Wins.textContent = scores.player2.wins;
+    player2Losses.textContent = scores.player2.losses;
 }
 
 function restartGame() {
