@@ -66,6 +66,13 @@ function isDraw() {
     });
 }
 
+function updateScoreDisplay() {
+    player1Wins.textContent = scores.player1.wins;
+    player1Losses.textContent = scores.player1.losses;
+    player2Wins.textContent = scores.player2.wins;
+    player2Losses.textContent = scores.player2.losses;
+}
+
 function endGame(draw) {
     gameActive = false;
     if (draw) {
@@ -86,13 +93,6 @@ function endGame(draw) {
     }
 }
 
-function updateScoreDisplay() {
-    player1Wins.textContent = scores.player1.wins;
-    player1Losses.textContent = scores.player1.losses;
-    player2Wins.textContent = scores.player2.wins;
-    player2Losses.textContent = scores.player2.losses;
-}
-
 function restartGame() {
     isPlayer1Turn = true;
     gameActive = true;
@@ -103,8 +103,12 @@ function restartGame() {
     });
 }
 
+// Initialize the game
 cells.forEach(cell => {
     cell.addEventListener('click', handleCellClick);
 });
 
-restartButton.addEventListener('click', restartGame); 
+restartButton.addEventListener('click', restartGame);
+
+// Initialize score display
+updateScoreDisplay(); 
