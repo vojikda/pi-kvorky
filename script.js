@@ -159,6 +159,9 @@ function makeComputerMove() {
 
     let move;
     switch (computerDifficulty) {
+        case 'veryEasy':
+            move = getVeryEasyMove();
+            break;
         case 'easy':
             move = getRandomMove();
             break;
@@ -168,12 +171,26 @@ function makeComputerMove() {
         case 'hard':
             move = getSmartMove();
             break;
+        case 'expert':
+            move = getExpertMove();
+            break;
+        case 'master':
+            move = getMasterMove();
+            break;
     }
 
     if (move !== null) {
         const cell = cells[move];
         handleCellClick({ target: cell });
     }
+}
+
+function getVeryEasyMove() {
+    // Sometimes makes mistakes by not blocking obvious wins
+    if (Math.random() < 0.3) {
+        return getRandomMove();
+    }
+    return getSmartMove();
 }
 
 function getRandomMove() {
@@ -234,6 +251,202 @@ function getSmartMove() {
     }
 
     return getRandomMove();
+}
+
+function getExpertMove() {
+    // First, check if computer can win
+    for (let i = 0; i < cells.length; i++) {
+        if (!cells[i].classList.contains('circle') && !cells[i].classList.contains('cross')) {
+            cells[i].classList.add('cross');
+            if (checkWin('cross')) {
+                cells[i].classList.remove('cross');
+                return i;
+            }
+            cells[i].classList.remove('cross');
+        }
+    }
+
+    // Then, check if need to block player
+    for (let i = 0; i < cells.length; i++) {
+        if (!cells[i].classList.contains('circle') && !cells[i].classList.contains('cross')) {
+            cells[i].classList.add('circle');
+            if (checkWin('circle')) {
+                cells[i].classList.remove('circle');
+                return i;
+            }
+            cells[i].classList.remove('circle');
+        }
+    }
+
+    // Look for fork opportunities (creating multiple winning possibilities)
+    const forkMove = findForkMove();
+    if (forkMove !== null) {
+        return forkMove;
+    }
+
+    // Block opponent's fork
+    const blockForkMove = blockForkMove();
+    if (blockForkMove !== null) {
+        return blockForkMove;
+    }
+
+    // Try to take center
+    if (!cells[4].classList.contains('circle') && !cells[4].classList.contains('cross')) {
+        return 4;
+    }
+
+    // Take opposite corner if player has a corner
+    const oppositeCorner = getOppositeCorner();
+    if (oppositeCorner !== null) {
+        return oppositeCorner;
+    }
+
+    // Take any available corner
+    const corners = [0, 2, 6, 8];
+    const availableCorners = corners.filter(i => 
+        !cells[i].classList.contains('circle') && !cells[i].classList.contains('cross')
+    );
+    if (availableCorners.length > 0) {
+        return availableCorners[Math.floor(Math.random() * availableCorners.length)];
+    }
+
+    // Take any available side
+    const sides = [1, 3, 5, 7];
+    const availableSides = sides.filter(i => 
+        !cells[i].classList.contains('circle') && !cells[i].classList.contains('cross')
+    );
+    if (availableSides.length > 0) {
+        return availableSides[Math.floor(Math.random() * availableSides.length)];
+    }
+
+    return getRandomMove();
+}
+
+function getMasterMove() {
+    // Use minimax algorithm for perfect play
+    return getMinimaxMove();
+}
+
+function findForkMove() {
+    // Check for moves that create multiple winning possibilities
+    for (let i = 0; i < cells.length; i++) {
+        if (!cells[i].classList.contains('circle') && !cells[i].classList.contains('cross')) {
+            cells[i].classList.add('cross');
+            let winningPaths = 0;
+            
+            // Check how many winning paths this move creates
+            for (const combination of winningCombinations) {
+                if (combination.every(index => 
+                    cells[index].classList.contains('cross') || index === i
+                )) {
+                    winningPaths++;
+                }
+            }
+            
+            cells[i].classList.remove('cross');
+            if (winningPaths >= 2) {
+                return i;
+            }
+        }
+    }
+    return null;
+}
+
+function blockForkMove() {
+    // Check for moves that block opponent's fork
+    for (let i = 0; i < cells.length; i++) {
+        if (!cells[i].classList.contains('circle') && !cells[i].classList.contains('cross')) {
+            cells[i].classList.add('circle');
+            let winningPaths = 0;
+            
+            // Check how many winning paths this move creates for opponent
+            for (const combination of winningCombinations) {
+                if (combination.every(index => 
+                    cells[index].classList.contains('circle') || index === i
+                )) {
+                    winningPaths++;
+                }
+            }
+            
+            cells[i].classList.remove('circle');
+            if (winningPaths >= 2) {
+                return i;
+            }
+        }
+    }
+    return null;
+}
+
+function getOppositeCorner() {
+    const corners = [
+        [0, 8], // top-left and bottom-right
+        [2, 6]  // top-right and bottom-left
+    ];
+    
+    for (const [corner1, corner2] of corners) {
+        if (cells[corner1].classList.contains('circle') && 
+            !cells[corner2].classList.contains('circle') && 
+            !cells[corner2].classList.contains('cross')) {
+            return corner2;
+        }
+        if (cells[corner2].classList.contains('circle') && 
+            !cells[corner1].classList.contains('circle') && 
+            !cells[corner1].classList.contains('cross')) {
+            return corner1;
+        }
+    }
+    return null;
+}
+
+function getMinimaxMove() {
+    let bestScore = -Infinity;
+    let bestMove = null;
+    
+    for (let i = 0; i < cells.length; i++) {
+        if (!cells[i].classList.contains('circle') && !cells[i].classList.contains('cross')) {
+            cells[i].classList.add('cross');
+            let score = minimax(0, false);
+            cells[i].classList.remove('cross');
+            
+            if (score > bestScore) {
+                bestScore = score;
+                bestMove = i;
+            }
+        }
+    }
+    
+    return bestMove;
+}
+
+function minimax(depth, isMaximizing) {
+    // Check for terminal states
+    if (checkWin('cross')) return 10 - depth;
+    if (checkWin('circle')) return depth - 10;
+    if (isDraw()) return 0;
+    
+    if (isMaximizing) {
+        let bestScore = -Infinity;
+        for (let i = 0; i < cells.length; i++) {
+            if (!cells[i].classList.contains('circle') && !cells[i].classList.contains('cross')) {
+                cells[i].classList.add('cross');
+                let score = minimax(depth + 1, false);
+                cells[i].classList.remove('cross');
+                bestScore = Math.max(score, bestScore);
+            }
+        }
+        return bestScore;
+    } else {
+        let bestScore = Infinity;
+        for (let i = 0; i < cells.length; i++) {
+            if (!cells[i].classList.contains('circle') && !cells[i].classList.contains('cross')) {
+                cells[i].classList.add('circle');
+                let score = minimax(depth + 1, true);
+                cells[i].classList.remove('circle');
+                bestScore = Math.min(score, bestScore);
+            }
+        }
+        return bestScore;
+    }
 }
 
 // Initialize the game
