@@ -45,6 +45,10 @@ function checkWin() {
     for (const combination of winningCombinations) {
         const [a, b, c] = combination;
         if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+            // Highlight winning cells
+            cells[a].classList.add('winning');
+            cells[b].classList.add('winning');
+            cells[c].classList.add('winning');
             return true;
         }
     }
@@ -59,12 +63,13 @@ function checkDraw() {
 // Handle cell click
 function handleCellClick(e) {
     const cell = e.target;
-    const index = cell.getAttribute('data-index');
+    const index = parseInt(cell.getAttribute('data-index'));
 
     if (boardState[index] !== '' || !gameActive) return;
 
+    // Update board state and UI
     boardState[index] = currentPlayer;
-    cell.textContent = currentPlayer;
+    cell.textContent = currentPlayer === 'X' ? '×' : '○';
     cell.classList.add(currentPlayer.toLowerCase());
 
     // Play sound effect
@@ -87,6 +92,7 @@ function handleCellClick(e) {
         return;
     }
 
+    // Switch player
     currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
     status.textContent = `Player ${currentPlayer === 'X' ? '1' : '2'}'s turn (${currentPlayer === 'X' ? 'Blue' : 'Red'})`;
     status.classList.add('player-turn');
@@ -102,7 +108,7 @@ function restartGame() {
     
     cells.forEach(cell => {
         cell.textContent = '';
-        cell.classList.remove('x', 'o');
+        cell.classList.remove('x', 'o', 'winning');
     });
 }
 
