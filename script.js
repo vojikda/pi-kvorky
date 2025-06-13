@@ -14,6 +14,13 @@ let scores = {
     player2: { wins: 0, losses: 0 }
 };
 
+// Sound effects
+const sounds = {
+    click: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'),
+    win: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'),
+    draw: new Audio('https://assets.mixkit.co/active_storage/sfx/1434/1434-preview.mp3')
+};
+
 const winningCombinations = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
     [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
@@ -28,6 +35,7 @@ function handleCellClick(e) {
 
     const currentClass = isPlayer1Turn ? 'circle' : 'cross';
     placeMark(cell, currentClass);
+    sounds.click.play();
 
     if (checkWin(currentClass)) {
         endGame(false);
@@ -50,13 +58,19 @@ function placeMark(cell, currentClass) {
 function swapTurns() {
     isPlayer1Turn = !isPlayer1Turn;
     status.textContent = isPlayer1Turn ? "Player 1's turn (Blue)" : "Player 2's turn (Red)";
+    status.style.color = isPlayer1Turn ? '#007bff' : '#dc3545';
 }
 
 function checkWin(currentClass) {
     return winningCombinations.some(combination => {
-        return combination.every(index => {
-            return cells[index].classList.contains(currentClass);
-        });
+        if (combination.every(index => cells[index].classList.contains(currentClass))) {
+            // Highlight winning combination
+            combination.forEach(index => {
+                cells[index].classList.add('winning-cell');
+            });
+            return true;
+        }
+        return false;
     });
 }
 
@@ -77,9 +91,13 @@ function endGame(draw) {
     gameActive = false;
     if (draw) {
         status.textContent = "Game ended in a draw!";
+        status.style.color = '#6c757d';
+        sounds.draw.play();
     } else {
         const winner = isPlayer1Turn ? "Player 1" : "Player 2";
         status.textContent = `${winner} wins!`;
+        status.style.color = winner === "Player 1" ? '#007bff' : '#dc3545';
+        sounds.win.play();
         
         // Update scores
         if (winner === "Player 1") {
@@ -97,8 +115,9 @@ function restartGame() {
     isPlayer1Turn = true;
     gameActive = true;
     status.textContent = "Player 1's turn (Blue)";
+    status.style.color = '#007bff';
     cells.forEach(cell => {
-        cell.classList.remove('circle', 'cross');
+        cell.classList.remove('circle', 'cross', 'winning-cell');
         cell.textContent = '';
     });
 }
