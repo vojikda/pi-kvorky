@@ -59,10 +59,26 @@ h1 {
     margin-bottom: 1rem;
     font-size: 1.2rem;
     color: #666;
-    padding: 0.5rem;
+    padding: 0.8rem;
     border-radius: 8px;
     background-color: #f8f9fa;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.status.computer-turn {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2);
+}
+
+.status.player-turn {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
 }
 
 .game-board {
@@ -274,4 +290,63 @@ h1 {
     width: 1.2rem;
     height: 1.2rem;
     cursor: pointer;
+}
+
+/* Computer thinking animation */
+@keyframes thinking {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.computer-thinking {
+    position: relative;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    border-radius: 8px;
+    animation: thinking 1s infinite;
+    display: inline-block;
+    margin-left: 0.5rem;
+}
+
+.computer-thinking::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Disabled state for board during computer's turn */
+.game-board.disabled {
+    opacity: 0.7;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Enhanced cell hover effect */
+.cell:not(.disabled):hover {
+    background-color: #e9ecef;
+    transform: scale(1.05) rotateX(5deg);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Computer move highlight */
+@keyframes computerMove {
+    0% { background-color: rgba(220, 53, 69, 0.1); }
+    50% { background-color: rgba(220, 53, 69, 0.2); }
+    100% { background-color: rgba(220, 53, 69, 0.1); }
+}
+
+.cell.computer-move {
+    animation: computerMove 0.5s ease-out;
 } 

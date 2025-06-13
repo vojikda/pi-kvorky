@@ -165,34 +165,89 @@ function restartGame() {
     board.style.pointerEvents = 'auto';
 }
 
-function makeComputerMove() {
-    if (!gameActive) return;
-
-    let move;
-    switch (computerDifficulty) {
-        case 'veryEasy':
-            move = getVeryEasyMove();
-            break;
-        case 'easy':
-            move = getRandomMove();
-            break;
-        case 'medium':
-            move = Math.random() < 0.5 ? getRandomMove() : getSmartMove();
-            break;
-        case 'hard':
-            move = getSmartMove();
-            break;
-        case 'expert':
-            move = getExpertMove();
-            break;
-        case 'master':
-            move = getMasterMove();
-            break;
+function updateStatus() {
+    if (isComputerMode && isPlayer1Turn) {
+        status.textContent = "Computer's turn";
+        status.classList.add('computer-turn');
+        status.classList.remove('player-turn');
+        status.innerHTML += '<span class="computer-thinking"></span>';
+        board.classList.add('disabled');
+    } else {
+        status.textContent = `${isPlayer1Turn ? 'Player 1' : 'Player 2'}'s turn (${isPlayer1Turn ? 'Blue' : 'Red'})`;
+        status.classList.add('player-turn');
+        status.classList.remove('computer-turn');
+        board.classList.remove('disabled');
     }
+}
 
-    if (move !== null) {
-        const cell = cells[move];
-        handleCellClick({ target: cell });
+function makeComputerMove() {
+    if (isComputerMode && isPlayer1Turn && gameActive) {
+        board.classList.add('disabled');
+        updateStatus();
+        
+        // Add a small delay to show the thinking animation
+        setTimeout(() => {
+            let move;
+            switch (computerDifficulty) {
+                case 'veryEasy':
+                    move = getVeryEasyMove();
+                    break;
+                case 'easy':
+                    move = getRandomMove();
+                    break;
+                case 'medium':
+                    move = Math.random() < 0.5 ? getSmartMove() : getRandomMove();
+                    break;
+                case 'hard':
+                    move = getSmartMove();
+                    break;
+                case 'expert':
+                    move = getExpertMove();
+                    break;
+                case 'master':
+                    move = getMasterMove();
+                    break;
+                default:
+                    move = getRandomMove();
+            }
+
+            if (move !== -1) {
+                const cell = cells[move];
+                cell.textContent = '○';
+                cell.classList.add('computer-move');
+                
+                // Play sound effect
+                const moveSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+                moveSound.volume = 0.3;
+                moveSound.play();
+                
+                // Remove the computer-move class after animation
+                setTimeout(() => {
+                    cell.classList.remove('computer-move');
+                }, 500);
+
+                if (checkWin('○')) {
+                    gameActive = false;
+                    status.textContent = 'Computer wins!';
+                    status.classList.remove('computer-turn', 'player-turn');
+                    scores.player2.wins++;
+                    updateScoreDisplay();
+                    return;
+                }
+
+                if (isDraw()) {
+                    gameActive = false;
+                    status.textContent = "It's a draw!";
+                    status.classList.remove('computer-turn', 'player-turn');
+                    return;
+                }
+
+                isPlayer1Turn = false;
+                updateStatus();
+            }
+            
+            board.classList.remove('disabled');
+        }, 1000); // Increased delay to show thinking animation
     }
 }
 
