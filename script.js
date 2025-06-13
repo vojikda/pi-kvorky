@@ -6,9 +6,14 @@ const player1Wins = document.getElementById('player1Wins');
 const player1Losses = document.getElementById('player1Losses');
 const player2Wins = document.getElementById('player2Wins');
 const player2Losses = document.getElementById('player2Losses');
+const pvpMode = document.getElementById('pvpMode');
+const pvcMode = document.getElementById('pvcMode');
+const computerSettings = document.getElementById('computerSettings');
 
 let isPlayer1Turn = true;
 let gameActive = true;
+let isComputerMode = false;
+let computerDifficulty = 'easy';
 let scores = {
     player1: { wins: 0, losses: 0 },
     player2: { wins: 0, losses: 0 }
@@ -27,6 +32,30 @@ const winningCombinations = [
     [0, 4, 8], [2, 4, 6] // Diagonals
 ];
 
+// Game mode handling
+pvpMode.addEventListener('click', () => {
+    isComputerMode = false;
+    pvpMode.classList.add('active');
+    pvcMode.classList.remove('active');
+    computerSettings.classList.add('hidden');
+    restartGame();
+});
+
+pvcMode.addEventListener('click', () => {
+    isComputerMode = true;
+    pvcMode.classList.add('active');
+    pvpMode.classList.remove('active');
+    computerSettings.classList.remove('hidden');
+    restartGame();
+});
+
+// Difficulty selection
+document.querySelectorAll('input[name="difficulty"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        computerDifficulty = e.target.value;
+    });
+});
+
 function handleCellClick(e) {
     const cell = e.target;
     if (!gameActive || cell.classList.contains('circle') || cell.classList.contains('cross')) {
@@ -43,6 +72,9 @@ function handleCellClick(e) {
         endGame(true);
     } else {
         swapTurns();
+        if (isComputerMode && !isPlayer1Turn) {
+            setTimeout(makeComputerMove, 500);
+        }
     }
 }
 
@@ -120,6 +152,88 @@ function restartGame() {
         cell.classList.remove('circle', 'cross', 'winning-cell');
         cell.textContent = '';
     });
+}
+
+function makeComputerMove() {
+    if (!gameActive) return;
+
+    let move;
+    switch (computerDifficulty) {
+        case 'easy':
+            move = getRandomMove();
+            break;
+        case 'medium':
+            move = Math.random() < 0.5 ? getRandomMove() : getSmartMove();
+            break;
+        case 'hard':
+            move = getSmartMove();
+            break;
+    }
+
+    if (move !== null) {
+        const cell = cells[move];
+        handleCellClick({ target: cell });
+    }
+}
+
+function getRandomMove() {
+    const emptyCells = [...cells].filter(cell => 
+        !cell.classList.contains('circle') && !cell.classList.contains('cross')
+    );
+    if (emptyCells.length === 0) return null;
+    const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    return [...cells].indexOf(randomCell);
+}
+
+function getSmartMove() {
+    // First, check if computer can win
+    for (let i = 0; i < cells.length; i++) {
+        if (!cells[i].classList.contains('circle') && !cells[i].classList.contains('cross')) {
+            cells[i].classList.add('cross');
+            if (checkWin('cross')) {
+                cells[i].classList.remove('cross');
+                return i;
+            }
+            cells[i].classList.remove('cross');
+        }
+    }
+
+    // Then, check if need to block player
+    for (let i = 0; i < cells.length; i++) {
+        if (!cells[i].classList.contains('circle') && !cells[i].classList.contains('cross')) {
+            cells[i].classList.add('circle');
+            if (checkWin('circle')) {
+                cells[i].classList.remove('circle');
+                return i;
+            }
+            cells[i].classList.remove('circle');
+        }
+    }
+
+    // Try to take center
+    if (!cells[4].classList.contains('circle') && !cells[4].classList.contains('cross')) {
+        return 4;
+    }
+
+    // Take any available corner
+    const corners = [0, 2, 6, 8];
+    const availableCorners = corners.filter(i => 
+        !cells[i].classList.contains('circle') && !cells[i].classList.contains('cross')
+    );
+    if (availableCorners.length > 0) {
+        return availableCorners[Math.floor(Math.random() * availableCorners.length)];
+    }
+
+    // Take any available side
+    const sides = [1, 3, 5, 7];
+    const availableSides = sides.filter(i => 
+        !cells[i].classList.contains('circle') && !cells[i].classList.contains('cross')
+    );
+    if (availableSides.length > 0) {
+        return availableSides[Math.floor(Math.random() * availableSides.length)];
+    }
+
+    return getRandomMove();
 }
 
 // Initialize the game

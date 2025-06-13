@@ -9,6 +9,29 @@
 <body>
     <div class="container">
         <h1>Matyskovo piskvorky</h1>
+        
+        <div class="game-mode-selector">
+            <h3>Select Game Mode</h3>
+            <div class="mode-buttons">
+                <button id="pvpMode" class="mode-button active">Player vs Player</button>
+                <button id="pvcMode" class="mode-button">Player vs Computer</button>
+            </div>
+            <div id="computerSettings" class="computer-settings hidden">
+                <h4>Computer Settings</h4>
+                <div class="difficulty-selector">
+                    <label>
+                        <input type="radio" name="difficulty" value="easy" checked> Easy
+                    </label>
+                    <label>
+                        <input type="radio" name="difficulty" value="medium"> Medium
+                    </label>
+                    <label>
+                        <input type="radio" name="difficulty" value="hard"> Hard
+                    </label>
+                </div>
+            </div>
+        </div>
+
         <div class="status" id="status">Player 1's turn (Blue)</div>
         <div class="game-board" id="board">
             <div class="cell" data-cell></div>
